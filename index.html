@@ -95,6 +95,24 @@ body.light .muscle-region.primary{fill:rgba(0,184,130,0.3);stroke:rgba(0,184,130
 body.light .muscle-region.secondary{fill:rgba(61,107,239,0.2);stroke:rgba(61,107,239,0.4)}
 .anatomy-detail{fill:var(--border-light);stroke:var(--border-light);stroke-width:0.5}
 .anatomy-line{stroke:var(--border);stroke-width:0.4}
+/* Onboarding */
+.onboard{position:fixed;inset:0;background:var(--bg);z-index:280;display:flex;flex-direction:column;padding:calc(40px + var(--safe-top)) 24px 40px;overflow-y:auto}
+.onboard-step{font-size:10px;font-weight:700;color:var(--accent);letter-spacing:0.12em;text-transform:uppercase;margin-bottom:8px}
+.onboard-title{font-family:var(--font-display);font-size:32px;letter-spacing:0.06em;margin-bottom:8px;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.onboard-desc{font-size:13px;color:var(--text-secondary);line-height:1.6;margin-bottom:24px}
+.onboard-options{display:flex;flex-direction:column;gap:8px;margin-bottom:24px;flex:1}
+.onboard-opt{background:var(--card);border:1px solid var(--border-light);border-radius:var(--radius-sm);padding:14px 16px;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;gap:12px}
+.onboard-opt:active{transform:scale(0.98)}
+.onboard-opt.selected{border-color:rgba(0,229,160,0.4);background:var(--accent-dim)}
+.onboard-opt-icon{font-size:20px}
+.onboard-opt-text{font-size:13px;font-weight:600}
+.onboard-opt-desc{font-size:10px;color:var(--text-tertiary);margin-top:2px}
+.onboard-input{margin-bottom:16px}
+.onboard-input label{font-size:12px;font-weight:600;color:var(--text-secondary);display:block;margin-bottom:6px}
+.onboard-progress{display:flex;gap:4px;margin-bottom:24px}
+.onboard-dot{flex:1;height:3px;border-radius:2px;background:var(--border-light);transition:background 0.3s}
+.onboard-dot.done{background:var(--accent)}
+.onboard-dot.current{background:var(--accent);opacity:0.5}
 .ex-header{padding:14px 16px;display:flex;align-items:center;gap:12px;cursor:pointer}
 .ex-num{width:28px;height:28px;border-radius:50%;background:var(--accent-dim);color:var(--accent);font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .ex.done .ex-num{background:var(--success-dim);color:var(--success)}
@@ -387,13 +405,61 @@ lsit:{name:"L-Sit → V-Sit",icon:"🦿",current:1,progressions:[{level:1,name:"
 };
 
 const PLAN={
-day1:{name:"Pull & Front Lever",emoji:"🔻",type:"skill",sections:[{title:"Skill-Arbeit",icon:"🎯",exercises:[{name:"Front Lever Prog.",sets:5,reps:"6-10s Hold",rest:150,note:"Aktuelle Stufe + darunter",skill:"frontLever"},{name:"Muscle-Up Überg.",sets:4,reps:"2-3",rest:150,note:"Sauberer Übergang",skill:"muscleUp"}]},{title:"Kraft",icon:"💪",exercises:[{name:"Gew. Klimmzüge",sets:4,reps:"5-8",rest:120,note:"Weste"},{name:"FL Rows (Tuck)",sets:3,reps:"6-8",rest:120,note:"Schulterblätter!"},{name:"Archer Pull-Ups",sets:3,reps:"4-6/S.",rest:90,note:"Kontrolliert"}]},{title:"Gym",icon:"🏋️",exercises:[{name:"Kabelrudern",sets:3,reps:"10-12",rest:90,note:"Mittl. Rücken"},{name:"Face Pulls",sets:3,reps:"15-20",rest:60,note:"Hint. Schulter"},{name:"Bizeps-Curls",sets:3,reps:"10-12",rest:60,note:"Zughilfe"}]}]},
-day2:{name:"Push & Planche",emoji:"🤸",type:"skill",sections:[{title:"Skill-Arbeit",icon:"🎯",exercises:[{name:"Planche Prog.",sets:5,reps:"8-12s Hold",rest:150,note:"Parallettes",skill:"planche"},{name:"HSPU Prog.",sets:4,reps:"3-5",rest:150,note:"Akt. Stufe",skill:"hspu"}]},{title:"Kraft",icon:"💪",exercises:[{name:"Pseudo Planche PU",sets:4,reps:"8-10",rest:90,note:"Max Lean"},{name:"Dips (gew.)",sets:3,reps:"6-8",rest:120,note:"Weste"},{name:"Pike PU (elev.)",sets:3,reps:"8-10",rest:90,note:"Füße hoch"}]},{title:"Gym",icon:"🏋️",exercises:[{name:"Kabelzug-Flys",sets:3,reps:"12-15",rest:60,note:"Brust"},{name:"Seitheben",sets:4,reps:"15-20",rest:60,note:"Seitl. Schulter"},{name:"Trizeps-Drücken",sets:3,reps:"12-15",rest:60,note:"Lockout"}]}]},
-day3:{name:"Beine & Core",emoji:"🦵",type:"strength",sections:[{title:"Skill-Arbeit",icon:"🎯",exercises:[{name:"L-Sit / V-Sit",sets:4,reps:"10-15s Hold",rest:90,note:"Parallettes",skill:"lsit"},{name:"Freier Handstand",sets:5,reps:"15-20s Hold",rest:60,note:"Balance"}]},{title:"Kraft",icon:"💪",exercises:[{name:"Pistol Squats",sets:4,reps:"5-8/S.",rest:120,note:"Band falls nötig"},{name:"Nordics",sets:3,reps:"4-6",rest:120,note:"Negativ"},{name:"Dragon Flags",sets:3,reps:"5-8",rest:90,note:"Core"}]},{title:"Gym",icon:"🏋️",exercises:[{name:"Beinpresse",sets:3,reps:"10-12",rest:120,note:"Hypertrophie"},{name:"Beinstrecker",sets:3,reps:"12-15",rest:60,note:"Quads"},{name:"Wadenheben",sets:4,reps:"15-20",rest:60,note:"Voller ROM"}]}]},
-day4:{name:"Skills & Flags",emoji:"🚩",type:"skill",sections:[{title:"Skill-Arbeit",icon:"🎯",exercises:[{name:"Human Flag",sets:5,reps:"5-8s Hold",rest:150,note:"Beide Seiten!",skill:"humanFlag"},{name:"FL Rows",sets:4,reps:"4-6",rest:120,note:"Tuck/Straddle",skill:"frontLever"},{name:"MU Drills",sets:4,reps:"2-3",rest:150,note:"→ Strict!",skill:"muscleUp"}]},{title:"Kraft",icon:"💪",exercises:[{name:"Typewriter PU",sets:3,reps:"3-4/S.",rest:120,note:"Seitl. Kraft"},{name:"Side Plank (gew.)",sets:3,reps:"20-30s/S.",rest:60,note:"Obliques"},{name:"Vorgeb. Seitheben",sets:3,reps:"15-20",rest:60,note:"Hint. Schulter"}]},{title:"Gym",icon:"🏋️",exercises:[{name:"Latzug (breit)",sets:3,reps:"10-12",rest:90,note:"Lat-Breite"},{name:"Aufr. Rudern",sets:3,reps:"12-15",rest:60,note:"Schulter"},{name:"Shrugs",sets:3,reps:"12-15",rest:60,note:"Nacken"}]}]},
-day5:{name:"Push Volume",emoji:"⚡",type:"skill",sections:[{title:"Skill-Arbeit",icon:"🎯",exercises:[{name:"Planche Leans",sets:5,reps:"10-15s",rest:120,note:"Max Lean",skill:"planche"},{name:"HSPU Volumen",sets:4,reps:"Max Reps",rest:120,note:"Volumen",skill:"hspu"}]},{title:"Kraft",icon:"💪",exercises:[{name:"Gew. Dips",sets:4,reps:"6-8",rest:120,note:"Weste"},{name:"Planche PU",sets:3,reps:"5-8",rest:120,note:"Lean"},{name:"HS Walk/Taps",sets:3,reps:"30s/8-10",rest:90,note:"Stabilität"}]},{title:"Gym",icon:"🏋️",exercises:[{name:"Schrägbank (KH)",sets:3,reps:"8-10",rest:90,note:"Ob. Brust"},{name:"Frontheben",sets:3,reps:"12-15",rest:60,note:"Vord. Schulter"},{name:"ÜK-Trizeps",sets:3,reps:"10-12",rest:60,note:"Lang. Kopf"}]}]}
+day1:{name:"Pull & Muscle-Up",emoji:"🔄",type:"skill",day:"Mo",sections:[
+{title:"Skill-Arbeit (Prio 1: Strict MU)",icon:"🎯",exercises:[
+{name:"Muscle-Up Drills",sets:6,reps:"2-3 Reps",rest:180,note:"Fokus: Strict! False-Grip, kein Kipping. Qualität > Quantität",skill:"muscleUp"},
+{name:"High Pull-Ups (Brust)",sets:3,reps:"5",rest:120,note:"Explosiv! So hoch wie möglich ziehen, Übergangs-Kraft aufbauen"}]},
+{title:"Lat-Breite & Kraft",icon:"💪",exercises:[
+{name:"Gew. Klimmzüge (+20kg)",sets:5,reps:"5-6",rest:150,note:"20kg Weste, schulterbreit, voller ROM"},
+{name:"Archer Pull-Ups",sets:3,reps:"4-5/Seite",rest:120,note:"Maximale Lat-Aktivierung pro Seite"},
+{name:"Einarm-KH-Rudern",sets:3,reps:"8-10",rest:90,note:"Schwer, volle Dehnung unten"}]},
+{title:"Gym – Lat-Breite",icon:"🏋️",exercises:[
+{name:"Latzug (breit)",sets:4,reps:"10-12",rest:90,note:"Breiter Griff, Fokus Lat-Stretch"},
+{name:"Kabelrudern (eng)",sets:3,reps:"10-12",rest:90,note:"Mittlerer Rücken, Schulterblätter"},
+{name:"Face Pulls",sets:3,reps:"15-20",rest:60,note:"Schultergesundheit"},
+{name:"Hammer Curls",sets:3,reps:"10-12",rest:60,note:"Brachialis + Unterarm"}]}]},
+day2:{name:"Push & Planche",emoji:"🤸",type:"skill",day:"Mi",sections:[
+{title:"Skill-Arbeit",icon:"🎯",exercises:[
+{name:"Planche Progressionen",sets:5,reps:"8-12s Hold",rest:150,note:"Auf Parallettes. Aktuelle Stufe",skill:"planche"},
+{name:"HSPU Progressionen",sets:4,reps:"3-5 Reps",rest:150,note:"Wall/Free je nach Level",skill:"hspu"}]},
+{title:"Druckkraft",icon:"💪",exercises:[
+{name:"Gew. Dips (+20kg)",sets:4,reps:"6-8",rest:120,note:"20kg Weste, kontrolliert"},
+{name:"Pseudo Planche PU",sets:4,reps:"8-10",rest:90,note:"Maximaler Lean nach vorne"},
+{name:"Pike PU (elevated)",sets:3,reps:"8-10",rest:90,note:"Füße erhöht, Schulter-Fokus"}]},
+{title:"Gym – Schulter-Breite",icon:"🏋️",exercises:[
+{name:"Seitheben (Kabel)",sets:4,reps:"15-20",rest:60,note:"Seitliche Delts, leicht"},
+{name:"Cable Crossover",sets:3,reps:"12-15",rest:60,note:"Brust-Squeeze"},
+{name:"French Press",sets:3,reps:"10-12",rest:60,note:"Trizeps langer Kopf"},
+{name:"Frontheben",sets:3,reps:"12-15",rest:60,note:"Vordere Schulter"}]}]},
+day3:{name:"Pull & FL/Flag",emoji:"🔻",type:"skill",day:"Fr",sections:[
+{title:"Skill-Arbeit (FL & Flag)",icon:"🎯",exercises:[
+{name:"Front Lever Prog.",sets:5,reps:"6-10s Hold",rest:150,note:"Adv. Tuck → Straddle. Hüfte hoch!",skill:"frontLever"},
+{name:"Human Flag Prog.",sets:4,reps:"5-8s Hold",rest:150,note:"Beide Seiten! Straddle → Half",skill:"humanFlag"},
+{name:"FL Rows",sets:3,reps:"5-6",rest:120,note:"Tuck/Straddle, maximale Lat-Kontraktion"}]},
+{title:"Lat-Kraft & Breite",icon:"💪",exercises:[
+{name:"Gew. Klimmzüge (+20kg)",sets:4,reps:"5-6",rest:150,note:"Breiter Griff für Lat-Breite"},
+{name:"Typewriter Pull-Ups",sets:3,reps:"3-4/Seite",rest:120,note:"Seitliche Zugkraft für Flag"}]},
+{title:"Gym – Rücken-Volumen",icon:"🏋️",exercises:[
+{name:"T-Bar Rudern",sets:3,reps:"8-10",rest:90,note:"Schwer, Rückendicke"},
+{name:"Reverse Flys",sets:3,reps:"15-20",rest:60,note:"Hintere Schulter Balance"},
+{name:"Bizeps-Curls",sets:3,reps:"10-12",rest:60,note:"Zug-Unterstützung"},
+{name:"Shrugs",sets:3,reps:"12-15",rest:60,note:"Nacken für Flags"}]}]},
+day4:{name:"Beine, Core & Skills",emoji:"🦵",type:"strength",day:"So",sections:[
+{title:"Skill-Arbeit",icon:"🎯",exercises:[
+{name:"L-Sit / V-Sit Prog.",sets:4,reps:"10-15s Hold",rest:90,note:"Auf Parallettes, Compression",skill:"lsit"},
+{name:"Freier Handstand",sets:5,reps:"15-20s Hold",rest:60,note:"Balance & Kontrolle"},
+{name:"MU Extra Volume",sets:3,reps:"2-3 Reps",rest:150,note:"Bonus-Volumen für Strict MU",skill:"muscleUp"}]},
+{title:"Beine & Core",icon:"💪",exercises:[
+{name:"Pistol Squats",sets:4,reps:"5-8/Seite",rest:120,note:"Bodyweight oder mit Weste"},
+{name:"Nordics",sets:3,reps:"4-6",rest:120,note:"Exzentrisch kontrolliert"},
+{name:"Dragon Flags",sets:3,reps:"5-8",rest:90,note:"Anti-Extension Core"},
+{name:"Windshield Wipers",sets:3,reps:"6-8/Seite",rest:90,note:"Obliques für Flag"}]},
+{title:"Gym – Bein-Volumen",icon:"🏋️",exercises:[
+{name:"Beinpresse",sets:3,reps:"10-12",rest:120,note:"Quad-Hypertrophie"},
+{name:"Rumänisches Kreuzheben",sets:3,reps:"8-10",rest:90,note:"Hamstrings & Glutes"},
+{name:"Wadenheben",sets:4,reps:"15-20",rest:60,note:"Voller ROM"}]}]}
 };
-const DAYS=["day1","day2","day3","day4","day5"],DAYNAMES=["Mo","Di","Mi","Do","Fr"];
+const DAYS=["day1","day2","day3","day4"],DAYNAMES=["Mo","Mi","Fr","So"];
 const MONTHS=["Januar","Februar","März","April","Mai","Juni","Juli","August","September","Oktober","November","Dezember"];
 const WDAYS=["Sonntag","Montag","Dienstag","Mittwoch","Donnerstag","Freitag","Samstag"];
 
@@ -403,7 +469,7 @@ const BADGES=[
 {id:"s7",name:"Wochenkrieger",icon:"⚡",desc:"7 Tage Streak",check:s=>getStreak(s)>=7},
 {id:"s14",name:"Unstoppbar",icon:"💎",desc:"14 Tage Streak",check:s=>getStreak(s)>=14},
 {id:"s30",name:"Legende",icon:"👑",desc:"30 Tage Streak",check:s=>getStreak(s)>=30},
-{id:"w5",name:"Volle Woche",icon:"💪",desc:"5 Trainings/Woche",check:s=>Object.values(s.weekLog).some(d=>d.length>=5)},
+{id:"w5",name:"Volle Woche",icon:"💪",desc:"5 Trainings/Woche",check:s=>Object.values(s.weekLog).some(d=>d.length>=4)},
 {id:"lu",name:"Level Up",icon:"⬆️",desc:"Skill gelevelt",check:s=>Object.entries(s.skillLv).some(([k,v])=>v>SKILLS[k].current)},
 {id:"log",name:"Datenjunkie",icon:"📊",desc:"20+ Logs",check:s=>(Object.values(s.holdLogs).flat().length+Object.values(s.repLogs).flat().length)>=20},
 ];
@@ -416,12 +482,12 @@ let st={view:'home',selDay:null,selSkill:null,expEx:null,done:LD('done',{}),skil
 nutrition:LD('nutrition',{}),sleep:LD('sleep',{}),measures:LD('measures',{}),photos:LD('photos',[]),trackTab:'nutrition',showSummary:false,
 // Phase 4a
 libSearch:'',libCat:'',libDetail:null,
-// Phase 4b
-
+// Onboarding
+onboardDone:LD('onboardDone',false),onboardStep:0,onboardData:LD('onboardData',{})
 };
 if(st.theme==='light')document.body.classList.add('light');
 
-function set(p){Object.assign(st,p);const m={done:'done',skillLv:'skills',holdLogs:'holds',repLogs:'reps',weekLog:'week',bw:'bw',profile:'profile',notes:'notes',theme:'theme',deloadWeek:'deload',customEx:'customEx',nutrition:'nutrition',sleep:'sleep',measures:'measures',photos:'photos'};Object.entries(m).forEach(([sk,lk])=>{if(sk in p)SV(lk,st[sk])});render()}
+function set(p){Object.assign(st,p);const m={done:'done',skillLv:'skills',holdLogs:'holds',repLogs:'reps',weekLog:'week',bw:'bw',profile:'profile',notes:'notes',theme:'theme',deloadWeek:'deload',customEx:'customEx',nutrition:'nutrition',sleep:'sleep',measures:'measures',photos:'photos',onboardDone:'onboardDone',onboardData:'onboardData'};Object.entries(m).forEach(([sk,lk])=>{if(sk in p)SV(lk,st[sk])});render()}
 
 const td=()=>new Date().toISOString().slice(0,10);
 const fm=s=>`${Math.floor(s/60)}:${(s%60).toString().padStart(2,'0')}`;
@@ -875,7 +941,56 @@ function weekCompare(){
 }
 
 // ══════ RENDER ══════
+// ══════ ONBOARDING ══════
+const OB_STEPS=[
+{key:'name',title:'WIE HEISST DU?',desc:'Dein Name für dein Profil.',type:'input',placeholder:'Dein Name'},
+{key:'goal',title:'WAS IST DEIN ZIEL?',desc:'Wir passen den Plan an dein Ziel an.',type:'select',options:[
+{val:'Muskelaufbau & Skills',icon:'💪',text:'Muskelaufbau & Skills',desc:'Kraft + Calisthenics Skills'},
+{val:'Skills & schlank bleiben',icon:'🎯',text:'Skills & Definition',desc:'Skills lernen, lean bleiben'},
+{val:'Skills & Kraft maximieren',icon:'⚡',text:'Maximale Kraft',desc:'So stark wie möglich'}]},
+{key:'level',title:'DEIN ERFAHRUNGSLEVEL?',desc:'Damit wir die richtige Intensität wählen.',type:'select',options:[
+{val:'Anfänger',icon:'🌱',text:'Anfänger',desc:'< 6 Monate Training'},
+{val:'Fortgeschritten',icon:'💪',text:'Fortgeschritten',desc:'6-24 Monate'},
+{val:'Erfahren',icon:'🔥',text:'Erfahren',desc:'2+ Jahre'}]},
+{key:'pullups',title:'KLIMMZÜGE AM STÜCK?',desc:'Hilft uns dein Pull-Kraft-Level einzuschätzen.',type:'select',options:[
+{val:'0-5',icon:'1️⃣',text:'0-5',desc:'Noch am Aufbauen'},
+{val:'5-10',icon:'5️⃣',text:'5-10',desc:'Solide Basis'},
+{val:'10-20',icon:'🔟',text:'10-20',desc:'Stark'},
+{val:'20+',icon:'💎',text:'20+',desc:'Biest-Modus'}]},
+{key:'equipment',title:'DEIN EQUIPMENT?',desc:'Was hast du zur Verfügung?',type:'select',options:[
+{val:'Nur Bodyweight',icon:'🤸',text:'Nur Bodyweight',desc:'Stange & Boden'},
+{val:'Bodyweight + Gym',icon:'🏋️',text:'BW + Gym',desc:'Calisthenics + Maschinen'},
+{val:'Voll ausgestattet',icon:'⚡',text:'Voll ausgestattet',desc:'Weste, Parallettes, Bänder, Gym'}]},
+{key:'frequency',title:'WIE OFT PRO WOCHE?',desc:'Wir erstellen deinen optimalen Split.',type:'select',options:[
+{val:'3',icon:'3️⃣',text:'3 Tage',desc:'Kompakter Plan'},
+{val:'4',icon:'4️⃣',text:'4 Tage',desc:'Optimale Balance'},
+{val:'5',icon:'5️⃣',text:'5 Tage',desc:'Maximales Volumen'}]},
+];
+
+function rOnboard(){
+  const step=st.onboardStep;
+  const s=OB_STEPS[step];
+  const total=OB_STEPS.length;
+  let dots='';for(let i=0;i<total;i++){dots+=`<div class="onboard-dot ${i<step?'done':i===step?'current':''}"></div>`}
+  let content='';
+  if(s.type==='input'){
+    content=`<div class="onboard-input"><label>${s.placeholder}</label><input class="input" style="font-size:16px;padding:14px" placeholder="${s.placeholder}" value="${st.onboardData[s.key]||''}" oninput="st.onboardData['${s.key}']=this.value"></div>`;
+  }else{
+    content=`<div class="onboard-options">${s.options.map(o=>`<div class="onboard-opt ${st.onboardData[s.key]===o.val?'selected':''}" onclick="st.onboardData['${s.key}']='${o.val}';render()"><div class="onboard-opt-icon">${o.icon}</div><div><div class="onboard-opt-text">${o.text}</div><div class="onboard-opt-desc">${o.desc}</div></div></div>`).join('')}</div>`;
+  }
+  const canNext=!!st.onboardData[s.key];
+  const isLast=step===total-1;
+  let btns='';
+  if(step>0)btns+=`<button class="btn btn-ghost" style="flex:1;padding:14px" onclick="set({onboardStep:step-1>0?${step-1}:0})">← Zurück</button>`;
+  if(isLast)btns+=`<button class="btn btn-primary" style="flex:2;padding:14px;opacity:${canNext?1:0.4}" onclick="if(!${canNext})return;const p={...st.profile,...st.onboardData};set({profile:p,onboardDone:true,onboardData:st.onboardData})">🚀 Los geht's!</button>`;
+  else btns+=`<button class="btn btn-primary" style="flex:2;padding:14px;opacity:${canNext?1:0.4}" onclick="if(!${canNext})return;set({onboardStep:${step+1}})">Weiter →</button>`;
+
+  return`<div class="onboard"><div class="onboard-progress">${dots}</div><div class="onboard-step">Schritt ${step+1}/${total}</div><div class="onboard-title">${s.title}</div><div class="onboard-desc">${s.desc}</div>${content}<div style="display:flex;gap:8px;margin-top:auto">${btns}</div></div>`;
+}
+
 function render(){const a=document.getElementById('app');let h='';
+// Show onboarding if not done
+if(!st.onboardDone){h=rOnboard();a.innerHTML=h;return}
 if(st.view==='home')h=rHome();else if(st.view==='workout')h=rWorkout();else if(st.view==='skills')h=rSkills();else if(st.view==='stats')h=rStats();else if(st.view==='track')h=rTrack();else if(st.view==='library')h=rLibrary();else if(st.view==='profile')h=rProfile();
 if(st.timer)h+=`<div class="timer-bar rest"><div class="timer-time">${fm(st.timerLeft)}</div><div class="timer-label">Pause</div><button class="timer-close" onclick="stopTimer()">✕</button></div>`;
 else if(st.sw)h+=`<div class="timer-bar hold"><div class="timer-time">${fm(st.swTime)}</div><div class="timer-label">Hold</div><button class="timer-close" onclick="stopSW()">⏹</button></div>`;
@@ -905,7 +1020,7 @@ a.innerHTML=h}
 
 function rHome(){
   const wc=wkc(),streak=getStreak(st),now=new Date();
-  let dots='';for(let i=0;i<5;i++)dots+=`<div class="week-dot ${i<wc?'filled':i===wc?'current':''}"></div>`;
+  let dots='';for(let i=0;i<4;i++)dots+=`<div class="week-dot ${i<wc?'filled':i===wc?'current':''}"></div>`;
   let streakH=streak>0?`<div class="streak" style="margin-top:8px">🔥 ${streak} Tage Streak</div>`:'';
   let deloadH='';if(isDeload())deloadH=`<div class="card deload anim anim-1" onclick="const w=new Set(Object.values(st.weekLog).flat().map(d=>d.slice(0,7))).size;set({deloadWeek:w})"><div style="display:flex;align-items:center;gap:12px"><div style="font-size:24px">🧘</div><div><div style="font-size:13px;font-weight:700;color:var(--warn)">Deload-Woche empfohlen</div><div style="font-size:11px;color:var(--text-secondary);margin-top:2px">Reduziere Volumen um 40-50%. Tippe zum Ausblenden.</div></div></div></div>`;
   let cards='';DAYS.forEach((dk,di)=>{const d=PLAN[dk],p=dp(dk),te=d.sections.reduce((a,s)=>a+s.exercises.length,0)+(st.customEx||[]).filter(c=>c.day===dk).length;
@@ -921,7 +1036,7 @@ function rHome(){
   const todayNut=st.nutrition[td()]||{cal:0,protein:0};
   const metricsH=`<div class="metrics-grid anim anim-2">
     <div class="metric-card"><div class="metric-icon">🔥</div><div class="metric-num">${streak}</div><div class="metric-desc">Tage Streak</div></div>
-    <div class="metric-card"><div class="metric-icon">📊</div><div class="metric-num">${wc}/5</div><div class="metric-desc">Diese Woche</div></div>
+    <div class="metric-card"><div class="metric-icon">📊</div><div class="metric-num">${wc}/4</div><div class="metric-desc">Diese Woche</div></div>
     <div class="metric-card"><div class="metric-icon">💪</div><div class="metric-num">${totalTrainings}</div><div class="metric-desc">Trainings gesamt</div></div>
     <div class="metric-card"><div class="metric-icon">📝</div><div class="metric-num">${totalLogs}</div><div class="metric-desc">Skill-Logs</div></div>
   </div>`;

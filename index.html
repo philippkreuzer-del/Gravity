@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="GRAVITY">
+<meta name="theme-color" content="#06080c">
+<title>GRAVITY – Calisthenics</title>
+<link rel="manifest" href="data:application/json;base64,eyJuYW1lIjoiR1JBVklUWSIsInNob3J0X25hbWUiOiJHUkFWSVRZIiwic3RhcnRfdXJsIjoiLiIsImRpc3BsYXkiOiJzdGFuZGFsb25lIiwiYmFja2dyb3VuZF9jb2xvciI6IiMwNjA4MGMiLCJ0aGVtZV9jb2xvciI6IiMwNjA4MGMifQ==">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #06080c; --card: rgba(255,255,255,0.025); --brd: rgba(255,255,255,0.06);
+  --a1: #00d4aa; --a2: #0099ff; --w: #ff6b35; --tx: #e2e0db; --dm: #5a5856; --ok: #4ade80;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+body { font-family: 'Syne','DM Sans',sans-serif; background: var(--bg); color: var(--tx); min-height: 100vh; min-height: 100dvh; overflow-x: hidden; }
+.app { max-width: 480px; margin: 0 auto; position: relative; padding-bottom: 80px; }
+input[type=number] { -moz-appearance: textfield; }
+input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+
+/* Animations */
+@keyframes fadeUp { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
+@keyframes pulse { 0%,100% { transform:scale(1); } 50% { transform:scale(1.05); } }
+.fade-up { animation: fadeUp 0.35s ease-out both; }
+
+.header { padding: 28px 20px 16px; padding-top: max(28px, env(safe-area-inset-top)); }
+.logo { font-size: 20px; font-weight: 800; letter-spacing: -0.02em; background: linear-gradient(135deg, var(--a1), var(--a2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.badge { background: rgba(0,212,170,0.08); border: 1px solid rgba(0,212,170,0.2); border-radius: 20px; padding: 5px 12px; font-size: 11px; font-weight: 700; color: var(--a1); }
+.body-content { padding: 0 20px; }
+.section-label { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.12em; color: var(--dm); margin-bottom: 10px; margin-top: 20px; }
+
+.card { background: var(--card); border: 1px solid var(--brd); border-radius: 14px; padding: 16px 18px; margin-bottom: 10px; cursor: pointer; position: relative; overflow: hidden; transition: all 0.2s; }
+.card.skill { background: linear-gradient(135deg, rgba(0,212,170,0.03), rgba(0,153,255,0.02)); border-color: rgba(0,212,170,0.15); }
+.card-title { font-size: 15px; font-weight: 700; margin-bottom: 3px; }
+.card-meta { font-size: 11px; color: var(--dm); }
+.card-progress { position: absolute; bottom: 0; left: 0; height: 2px; background: linear-gradient(90deg, var(--a1), var(--a2)); transition: width 0.4s; }
+.skill-badge { font-size: 9px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; color: var(--a1); background: rgba(0,212,170,0.08); border-radius: 5px; padding: 2px 7px; display: inline-block; margin-top: 6px; }
+
+.ex-row { background: var(--card); border: 1px solid var(--brd); border-radius: 12px; padding: 14px; margin-bottom: 8px; transition: all 0.2s; }
+.ex-row.done { background: rgba(0,212,170,0.04); border-color: rgba(0,212,170,0.12); }
+.ex-name { font-size: 13px; font-weight: 700; }
+.ex-meta { font-size: 10px; color: var(--dm); margin-top: 2px; }
+.ex-skill { font-size: 10px; color: var(--a1); margin-top: 2px; }
+
+.set-circle { width: 32px; height: 32px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.12); background: transparent; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 12px; font-weight: 700; color: var(--dm); transition: all 0.15s; flex-shrink: 0; }
+.set-circle.done { border-color: var(--a1); background: rgba(0,212,170,0.12); color: var(--a1); }
+
+.btn { background: rgba(255,255,255,0.06); border: none; color: #fff; border-radius: 8px; padding: 8px 14px; font-size: 11px; font-weight: 700; cursor: pointer; font-family: inherit; }
+.btn.primary { background: linear-gradient(135deg, var(--a1), var(--a2)); box-shadow: 0 4px 16px rgba(0,212,170,0.2); }
+.btn.danger { color: #ff4444; }
+.btn.full { width: 100%; padding: 14px; font-size: 14px; margin-top: 16px; }
+
+.input { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 9px 12px; color: var(--tx); font-size: 13px; width: 100%; outline: none; font-family: inherit; }
+.back-btn { background: rgba(255,255,255,0.05); border: none; color: var(--tx); border-radius: 8px; padding: 7px 14px; font-size: 12px; font-weight: 600; cursor: pointer; margin-bottom: 16px; font-family: inherit; }
+
+.tip-box { font-size: 11px; margin-bottom: 10px; padding: 6px 10px; border-radius: 6px; }
+.tip-box.note { color: var(--w); background: rgba(255,107,53,0.05); }
+.tip-box.coach { color: var(--a2); background: rgba(0,153,255,0.05); }
+
+.stat-card { background: var(--card); border: 1px solid var(--brd); border-radius: 14px; padding: 18px; margin-bottom: 10px; }
+.stat-row { padding: 8px 0; border-bottom: 1px solid var(--brd); }
+.stat-row:last-child { border-bottom: none; }
+
+.level-dot { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; flex-shrink: 0; }
+.level-dot.done { border: 2px solid var(--ok); background: rgba(74,222,128,0.12); color: var(--ok); }
+.level-dot.current { border: 2px solid var(--a1); background: rgba(0,212,170,0.08); color: var(--a1); }
+.level-dot.future { border: 2px solid rgba(255,255,255,0.08); color: var(--dm); }
+.level-line { flex: 1; height: 2px; background: rgba(255,255,255,0.06); border-radius: 1px; }
+.level-line.done { background: var(--ok); }
+
+.timer-bar { position: fixed; bottom: 74px; left: 50%; transform: translateX(-50%); border-radius: 14px; padding: 12px 20px; z-index: 100; display: flex; align-items: center; gap: 12px; max-width: 360px; width: calc(100% - 40px); font-variant-numeric: tabular-nums; }
+.timer-bar.rest { background: linear-gradient(135deg, var(--a1), var(--a2)); box-shadow: 0 8px 32px rgba(0,212,170,0.3); }
+.timer-bar.hold { background: linear-gradient(135deg, var(--w), #e85d2a); box-shadow: 0 8px 32px rgba(255,107,53,0.3); }
+.timer-time { font-size: 24px; font-weight: 800; flex: 1; }
+.timer-label { font-size: 11px; font-weight: 600; opacity: 0.8; }
+.timer-close { background: rgba(0,0,0,0.2); border: none; color: #fff; border-radius: 6px; padding: 5px 10px; cursor: pointer; font-weight: 700; font-family: inherit; }
+
+.nav { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 480px; background: rgba(6,8,12,0.95); border-top: 1px solid var(--brd); display: flex; justify-content: space-around; padding: 10px 0 18px; padding-bottom: max(18px, env(safe-area-inset-bottom)); -webkit-backdrop-filter: blur(20px); backdrop-filter: blur(20px); z-index: 90; }
+.nav-item { display: flex; flex-direction: column; align-items: center; gap: 3px; cursor: pointer; font-size: 9px; font-weight: 700; letter-spacing: 0.05em; color: #3a3836; transition: color 0.2s; }
+.nav-item.active { color: var(--a1); }
+.nav-item span:first-child { font-size: 20px; }
+
+.profile-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--brd); }
+.profile-row:last-child { border-bottom: none; }
+.profile-label { font-size: 13px; color: var(--dm); }
+.profile-value { font-size: 13px; font-weight: 600; }
+
+.progress-bar-bg { margin-top: 10px; height: 3px; background: rgba(255,255,255,0.05); border-radius: 2px; }
+.progress-bar-fill { height: 100%; background: linear-gradient(90deg, var(--a1), var(--a2)); border-radius: 2px; transition: width 0.3s; }
+
+.bw-bar { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px; }
+.bw-bar-val { font-size: 7px; color: var(--dm); }
+.bw-bar-fill { width: 100%; border-radius: 3px; background: linear-gradient(to top, var(--a1), var(--a2)); min-height: 3px; }
+
+.hidden { display: none !important; }
+.chevron { font-size: 16px; color: var(--dm); transition: transform 0.2s; }
+.chevron.open { transform: rotate(180deg); }
+</style>
+</head>
+<body>
+<div class="app" id="app"></div>
+
+<script>
+// ─── DATA ───
+const PROFILE = {
+  height: "170-175 cm",
+  weight: "70-75 kg",
+  age: "28-32",
+  goal: "Muskelaufbau & Skills",
+  level: "Erfahren (2+ Jahre)",
+  frequency: "4-5× pro Woche",
+  duration: "~90 Min / Training",
+  focus: "Rücken & Schultern",
+  equipment: "Studio + Parallettes + Bänder + Weste",
+  nutrition: "Manchmal",
+  injuries: "Keine",
+  split: "Calisthenics Skill Progression"
+};
+
+const SKILLS = {
+  muscleUp: {
+    name: "Muscle-Up", icon: "🔄", current: 2,
+    progressions: [
+      { level:1, name:"High Pull-Ups", desc:"Klimmzug bis zur Brust", metric:"reps", target:"3×5 sauber" },
+      { level:2, name:"Kipping Muscle-Up", desc:"Mit Schwung über die Stange", metric:"reps", target:"3×3 kontrolliert", tip:"Fokus auf den Übergang: Handgelenke früh drehen, Ellbogen schnell über die Stange." },
+      { level:3, name:"Slow Muscle-Up", desc:"Langsamer, kontrollierter Übergang", metric:"reps", target:"3×2 clean", tip:"Explosiver Zug, dann bewusst langsam über die Stange gleiten. False-Grip üben!" },
+      { level:4, name:"Strict Muscle-Up", desc:"Kein Schwung, reine Kraft", metric:"reps", target:"3×3 strict", tip:"False-Grip ist Pflicht. Weighted Pull-Ups (30%+ BW) als Kraftbasis." },
+      { level:5, name:"Weighted Muscle-Up", desc:"Muscle-Up mit Gewichtsweste", metric:"reps", target:"3×3 mit 5-10kg" },
+    ]
+  },
+  frontLever: {
+    name: "Front Lever", icon: "🔻", current: 2,
+    progressions: [
+      { level:1, name:"Tuck Front Lever", desc:"Knie angezogen halten", metric:"hold", target:"3×15s", tip:"Schulterblätter zusammenziehen und runterdrücken." },
+      { level:2, name:"Adv. Tuck Front Lever", desc:"Knie leicht geöffnet", metric:"hold", target:"3×12s", tip:"Hüfte auf Stangenhöhe! Core maximal anspannen." },
+      { level:3, name:"Straddle Front Lever", desc:"Beine gespreizt und gestreckt", metric:"hold", target:"3×8s", tip:"Je enger die Grätsche, desto schwerer. Band-Assisted zum Gewöhnen." },
+      { level:4, name:"Half-Lay Front Lever", desc:"Ein Bein gestreckt, eins angezogen", metric:"hold", target:"3×6s" },
+      { level:5, name:"Full Front Lever", desc:"Komplett gestreckt, horizontal", metric:"hold", target:"3×5s", tip:"Lat-Kraft ist King. Schweres Rudern und FL Rows als Basis." },
+    ]
+  },
+  humanFlag: {
+    name: "Human Flag", icon: "🚩", current: 2,
+    progressions: [
+      { level:1, name:"Tuck Flag", desc:"Knie angezogen an der Stange", metric:"hold", target:"3×10s" },
+      { level:2, name:"Straddle Flag", desc:"Beine gespreizt", metric:"hold", target:"3×6s", tip:"Unterer Arm drückt, oberer zieht. Obliques trainieren!" },
+      { level:3, name:"Half Flag", desc:"Beine 45° zur Horizontalen", metric:"hold", target:"3×5s", tip:"Seitliches Plank-Training und Seitheben helfen." },
+      { level:4, name:"Full Flag", desc:"Komplett horizontal", metric:"hold", target:"3×3s" },
+      { level:5, name:"Flag Press", desc:"Dynamisch hoch- und runterdrücken", metric:"reps", target:"3×2" },
+    ]
+  },
+  planche: {
+    name: "Planche", icon: "🤸", current: 1,
+    progressions: [
+      { level:1, name:"Planche Lean", desc:"Lean forward im Liegestütz", metric:"hold", target:"3×20s", tip:"Auf Parallettes, Schultern weit vor die Hände. Protrahiert!" },
+      { level:2, name:"Tuck Planche", desc:"Knie angezogen, frei", metric:"hold", target:"3×12s", tip:"Auf Parallettes einfacher. Runder Rücken OK am Anfang." },
+      { level:3, name:"Adv. Tuck Planche", desc:"Rücken flacher", metric:"hold", target:"3×8s" },
+      { level:4, name:"Straddle Planche", desc:"Beine gespreizt gestreckt", metric:"hold", target:"3×5s", tip:"Pseudo Planche Push-Ups als Vorbereitung." },
+      { level:5, name:"Full Planche", desc:"Komplett gestreckt", metric:"hold", target:"3×3s" },
+    ]
+  },
+  hspu: {
+    name: "Handstand Push-Up", icon: "🤚", current: 2,
+    progressions: [
+      { level:1, name:"Wall HSPU (negativ)", desc:"Nur ablassen", metric:"reps", target:"3×5 langsam" },
+      { level:2, name:"Wall HSPU", desc:"Voller ROM an der Wand", metric:"reps", target:"3×8", tip:"Hände schulterbreit, Finger gespreizt. Tripod-Position." },
+      { level:3, name:"Deficit Wall HSPU", desc:"Auf Parallettes, mehr ROM", metric:"reps", target:"3×5", tip:"Langsam absenken! Gewichtsweste für extra Reiz." },
+      { level:4, name:"Free HSPU", desc:"Freistehend", metric:"reps", target:"3×3", tip:"Erst Balance meistern, dann drücken." },
+      { level:5, name:"90° HSPU", desc:"Auf Parallettes, volle Tiefe", metric:"reps", target:"3×2" },
+    ]
+  },
+  lsit: {
+    name: "L-Sit → V-Sit", icon: "🦿", current: 1,
+    progressions: [
+      { level:1, name:"Tuck L-Sit", desc:"Knie angezogen auf Parallettes", metric:"hold", target:"3×15s", tip:"Schultern runterdrücken! Hüfte hoch." },
+      { level:2, name:"L-Sit", desc:"Beine gestreckt horizontal", metric:"hold", target:"3×12s", tip:"Compression-Kraft aufbauen." },
+      { level:3, name:"L-Sit to V-Sit Raises", desc:"Dynamisch höher heben", metric:"reps", target:"3×5" },
+      { level:4, name:"V-Sit Hold", desc:"Beine über 90°", metric:"hold", target:"3×8s", tip:"Hamstring-Flexibilität ist oft der Engpass." },
+      { level:5, name:"Manna", desc:"Meister-Level", metric:"hold", target:"3×3s" },
+    ]
+  }
+};
+
+const WORKOUT_PLAN = {
+  day1: { name:"Pull & Front Lever", emoji:"🔻", type:"skill", sections:[
+    { title:"🎯 Skill-Arbeit (frisch)", exercises:[
+      { name:"Front Lever Progressionen", sets:5, reps:"6-10s Hold", rest:150, note:"Aktuelle Stufe + eine darunter", skill:"frontLever" },
+      { name:"Muscle-Up Übergänge", sets:4, reps:"2-3", rest:150, note:"Fokus sauberer Übergang", skill:"muscleUp" },
+    ]},
+    { title:"💪 Kraft (Calisthenics)", exercises:[
+      { name:"Gewichtete Klimmzüge", sets:4, reps:"5-8", rest:120, note:"Gewichtsweste" },
+      { name:"Front Lever Rows (Tuck)", sets:3, reps:"6-8", rest:120, note:"Schulterblätter zusammen!" },
+      { name:"Archer Pull-Ups", sets:3, reps:"4-6/Seite", rest:90, note:"Langsam und kontrolliert" },
+    ]},
+    { title:"🏋️ Gym-Ergänzung", exercises:[
+      { name:"Kabelrudern (eng)", sets:3, reps:"10-12", rest:90, note:"Mittlerer Rücken" },
+      { name:"Face Pulls (Kabel)", sets:3, reps:"15-20", rest:60, note:"Hintere Schulter" },
+      { name:"Bizeps-Curls", sets:3, reps:"10-12", rest:60, note:"Zughilfe" },
+    ]},
+  ]},
+  day2: { name:"Push & Planche", emoji:"🤸", type:"skill", sections:[
+    { title:"🎯 Skill-Arbeit (frisch)", exercises:[
+      { name:"Planche Progressionen", sets:5, reps:"8-12s Hold", rest:150, note:"Auf Parallettes", skill:"planche" },
+      { name:"HSPU Progressionen", sets:4, reps:"3-5", rest:150, note:"Aktuelle Stufe", skill:"hspu" },
+    ]},
+    { title:"💪 Kraft (Calisthenics)", exercises:[
+      { name:"Pseudo Planche Push-Ups", sets:4, reps:"8-10", rest:90, note:"Max Lean" },
+      { name:"Dips (gewichtet)", sets:3, reps:"6-8", rest:120, note:"Gewichtsweste" },
+      { name:"Pike Push-Ups (elevated)", sets:3, reps:"8-10", rest:90, note:"Füße erhöht" },
+    ]},
+    { title:"🏋️ Gym-Ergänzung", exercises:[
+      { name:"Kabelzug-Flys", sets:3, reps:"12-15", rest:60, note:"Brust-Isolation" },
+      { name:"Seitheben (Kabel)", sets:4, reps:"15-20", rest:60, note:"Seitliche Schulter" },
+      { name:"Trizeps-Drücken", sets:3, reps:"12-15", rest:60, note:"Lockout-Kraft" },
+    ]},
+  ]},
+  day3: { name:"Beine & Core", emoji:"🦵", type:"strength", sections:[
+    { title:"🎯 Skill-Arbeit", exercises:[
+      { name:"L-Sit / V-Sit Progressionen", sets:4, reps:"10-15s Hold", rest:90, note:"Auf Parallettes", skill:"lsit" },
+      { name:"Freier Handstand", sets:5, reps:"15-20s Hold", rest:60, note:"Balance-Training" },
+    ]},
+    { title:"💪 Kraft", exercises:[
+      { name:"Pistol Squats", sets:4, reps:"5-8/Seite", rest:120, note:"Band-Assisted falls nötig" },
+      { name:"Nordics (Beinbeuger)", sets:3, reps:"4-6", rest:120, note:"Negativ-Kontrolle" },
+      { name:"Dragon Flag Progressionen", sets:3, reps:"5-8", rest:90, note:"Core-Übung" },
+    ]},
+    { title:"🏋️ Gym-Ergänzung", exercises:[
+      { name:"Beinpresse", sets:3, reps:"10-12", rest:120, note:"Hypertrophie" },
+      { name:"Beinstrecker", sets:3, reps:"12-15", rest:60, note:"Quad-Isolation" },
+      { name:"Wadenheben", sets:4, reps:"15-20", rest:60, note:"Voller ROM" },
+    ]},
+  ]},
+  day4: { name:"Skill-Tag & Flags", emoji:"🚩", type:"skill", sections:[
+    { title:"🎯 Skill-Arbeit (Hauptfokus)", exercises:[
+      { name:"Human Flag Progressionen", sets:5, reps:"5-8s Hold", rest:150, note:"Beide Seiten!", skill:"humanFlag" },
+      { name:"Front Lever Rows", sets:4, reps:"4-6", rest:120, note:"Tuck oder Straddle", skill:"frontLever" },
+      { name:"Muscle-Up Drills", sets:4, reps:"2-3", rest:150, note:"Arbeite am Strict!", skill:"muscleUp" },
+    ]},
+    { title:"💪 Ergänzende Kraft", exercises:[
+      { name:"Typewriter Pull-Ups", sets:3, reps:"3-4/Seite", rest:120, note:"Seitliche Zugkraft" },
+      { name:"Side Plank (gewichtet)", sets:3, reps:"20-30s/Seite", rest:60, note:"Obliques für Flag" },
+      { name:"Vorgebeugtes Seitheben", sets:3, reps:"15-20", rest:60, note:"Hintere Schulter" },
+    ]},
+    { title:"🏋️ Gym-Ergänzung", exercises:[
+      { name:"Latzug (breit)", sets:3, reps:"10-12", rest:90, note:"Lat-Breite" },
+      { name:"Aufrechtes Rudern", sets:3, reps:"12-15", rest:60, note:"Schulter/Nacken" },
+      { name:"Shrugs", sets:3, reps:"12-15", rest:60, note:"Nacken für Flags" },
+    ]},
+  ]},
+  day5: { name:"Push & Planche Vol.", emoji:"⚡", type:"skill", sections:[
+    { title:"🎯 Skill-Arbeit", exercises:[
+      { name:"Planche Leans (intensiv)", sets:5, reps:"10-15s", rest:120, note:"Max Lean auf Parallettes", skill:"planche" },
+      { name:"HSPU Volumen", sets:4, reps:"Max Reps", rest:120, note:"Volumen sammeln", skill:"hspu" },
+    ]},
+    { title:"💪 Kraft (Calisthenics)", exercises:[
+      { name:"Gewichtete Dips", sets:4, reps:"6-8", rest:120, note:"Gewichtsweste" },
+      { name:"Planche Push-Up Progression", sets:3, reps:"5-8", rest:120, note:"Lean-Variante" },
+      { name:"Handstand Walk / Taps", sets:3, reps:"30s / 8-10", rest:90, note:"Stabilität" },
+    ]},
+    { title:"🏋️ Gym-Ergänzung", exercises:[
+      { name:"Schrägbankdrücken (KH)", sets:3, reps:"8-10", rest:90, note:"Obere Brust" },
+      { name:"Frontheben (Kabel)", sets:3, reps:"12-15", rest:60, note:"Vordere Schulter" },
+      { name:"Überkopf-Trizepsstr.", sets:3, reps:"10-12", rest:60, note:"Langer Kopf" },
+    ]},
+  ]}
+};
+
+const DAYS = ["day1","day2","day3","day4","day5"];
+
+// ─── STATE ───
+function load(k, d) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch { return d; } }
+function save(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+
+let state = {
+  view: "home",
+  selDay: null,
+  selSkill: null,
+  expandedEx: null,
+  done: load("g-done", {}),
+  skillLevels: load("g-skills", Object.fromEntries(Object.entries(SKILLS).map(([k,v])=>[k,v.current]))),
+  holdLogs: load("g-holds", {}),
+  repLogs: load("g-reps", {}),
+  weekLog: load("g-week", {}),
+  bodyWeight: load("g-bw", []),
+  timer: null,
+  timerLeft: 0,
+  stopwatch: false,
+  swTime: 0,
+  inputTarget: null,
+  inputVal: "",
+  showBwInput: false,
+  bwInput: "",
+  profileEdit: false,
+  profileData: load("g-profile", PROFILE),
+};
+
+function setState(patch) {
+  Object.assign(state, patch);
+  if ('done' in patch) save("g-done", state.done);
+  if ('skillLevels' in patch) save("g-skills", state.skillLevels);
+  if ('holdLogs' in patch) save("g-holds", state.holdLogs);
+  if ('repLogs' in patch) save("g-reps", state.repLogs);
+  if ('weekLog' in patch) save("g-week", state.weekLog);
+  if ('bodyWeight' in patch) save("g-bw", state.bodyWeight);
+  if ('profileData' in patch) save("g-profile", state.profileData);
+  render();
+}
+
+const today = () => new Date().toISOString().slice(0,10);
+const fmt = s => `${Math.floor(s/60)}:${(s%60).toString().padStart(2,'0')}`;
+const sKey = (dk,si,ei,seti) => `${today()}-${dk}-${si}-${ei}-${seti}`;
+
+function dayProg(dk) {
+  const d = WORKOUT_PLAN[dk]; let t=0, dn=0;
+  d.sections.forEach((s,si) => s.exercises.forEach((e,ei) => { for(let i=0;i<e.sets;i++) { t++; if(state.done[sKey(dk,si,ei,i)]) dn++; }}));
+  return t>0 ? Math.round((dn/t)*100) : 0;
+}
+
+function wkCt() { return (state.weekLog[today().slice(0,7)] || []).length; }
+
+// ─── TIMERS ───
+let timerInterval = null;
+let swInterval = null;
+
+function startRestTimer(seconds) {
+  clearInterval(timerInterval);
+  setState({ timer: seconds, timerLeft: seconds });
+  timerInterval = setInterval(() => {
+    state.timerLeft--;
+    if (state.timerLeft <= 0) { clearInterval(timerInterval); state.timer = null; state.timerLeft = 0; }
+    render();
+  }, 1000);
+}
+
+function stopRestTimer() { clearInterval(timerInterval); setState({ timer: null, timerLeft: 0 }); }
+
+function toggleStopwatch(skillKey) {
+  if (state.stopwatch) {
+    clearInterval(swInterval);
+    if (state.swTime > 0 && skillKey) {
+      const logs = { ...state.holdLogs };
+      logs[skillKey] = [...(logs[skillKey]||[]), { val: state.swTime, date: today() }];
+      setState({ stopwatch: false, swTime: 0, holdLogs: logs });
+    } else {
+      setState({ stopwatch: false, swTime: 0 });
+    }
+  } else {
+    setState({ stopwatch: true, swTime: 0 });
+    swInterval = setInterval(() => { state.swTime++; render(); }, 1000);
+  }
+}
+
+function stopStopwatch() { clearInterval(swInterval); setState({ stopwatch: false, swTime: 0 }); }
+
+// ─── RENDER ───
+function render() {
+  const app = document.getElementById('app');
+  let html = '';
+
+  if (state.view === 'home') html = renderHome();
+  else if (state.view === 'workout') html = renderWorkout();
+  else if (state.view === 'skills') html = renderSkills();
+  else if (state.view === 'stats') html = renderStats();
+  else if (state.view === 'profile') html = renderProfile();
+
+  if (state.timer) {
+    html += `<div class="timer-bar rest"><div class="timer-time">${fmt(state.timerLeft)}</div><div class="timer-label">Pause</div><button class="timer-close" onclick="stopRestTimer()">✕</button></div>`;
+  } else if (state.stopwatch) {
+    html += `<div class="timer-bar hold"><div class="timer-time">${fmt(state.swTime)}</div><div class="timer-label">Hold</div><button class="timer-close" onclick="stopStopwatch()">⏹</button></div>`;
+  }
+
+  html += `<div class="nav">
+    <div class="nav-item ${state.view==='home'?'active':''}" onclick="setState({view:'home',selDay:null,expandedEx:null})"><span>🏠</span><span>PLAN</span></div>
+    <div class="nav-item ${state.view==='skills'?'active':''}" onclick="setState({view:'skills',selSkill:null,expandedEx:null})"><span>🎯</span><span>SKILLS</span></div>
+    <div class="nav-item ${state.view==='stats'?'active':''}" onclick="setState({view:'stats',expandedEx:null})"><span>📊</span><span>STATS</span></div>
+    <div class="nav-item ${state.view==='profile'?'active':''}" onclick="setState({view:'profile',expandedEx:null})"><span>👤</span><span>PROFIL</span></div>
+  </div>`;
+
+  app.innerHTML = html;
+}
+
+function renderHome() {
+  let cards = '';
+  DAYS.forEach(dk => {
+    const d = WORKOUT_PLAN[dk]; const p = dayProg(dk);
+    const totalEx = d.sections.reduce((a,s) => a + s.exercises.length, 0);
+    cards += `<div class="card ${d.type==='skill'?'skill':''} fade-up" onclick="setState({view:'workout',selDay:'${dk}',expandedEx:null})" style="animation-delay:${DAYS.indexOf(dk)*0.06}s">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start">
+        <div>
+          <div class="card-title">${d.emoji} ${d.name}</div>
+          <div class="card-meta">${totalEx} Übungen · ~90 Min</div>
+          ${d.type==='skill' ? '<div class="skill-badge">Skill-Tag</div>' : ''}
+        </div>
+        ${p > 0 ? `<div style="font-size:18px;font-weight:800;color:${p===100?'var(--ok)':'var(--a1)'}">${p}%</div>` : ''}
+      </div>
+      <div class="card-progress" style="width:${p}%"></div>
+    </div>`;
+  });
+
+  return `<div class="header">
+    <div style="display:flex;align-items:center;justify-content:space-between">
+      <div class="logo">GRAVITY</div>
+      <div class="badge">${wkCt()}/5 diese Woche</div>
+    </div>
+    <div style="font-size:12px;color:var(--dm);margin-top:5px">Calisthenics Skill Progression</div>
+  </div>
+  <div class="body-content">
+    <div class="section-label">Trainingsplan</div>
+    ${cards}
+  </div>`;
+}
+
+function renderWorkout() {
+  if (!state.selDay) return '';
+  const d = WORKOUT_PLAN[state.selDay]; const p = dayProg(state.selDay);
+  let sections = '';
+
+  d.sections.forEach((sec, si) => {
+    let exs = '';
+    sec.exercises.forEach((ex, ei) => {
+      const allD = Array.from({length:ex.sets},(_,i) => !!state.done[sKey(state.selDay,si,ei,i)]).every(Boolean);
+      const exK = `${si}-${ei}`;
+      const isE = state.expandedEx === exK;
+      const sk = ex.skill ? SKILLS[ex.skill] : null;
+      const skLv = ex.skill ? state.skillLevels[ex.skill] : null;
+      const skP = sk ? sk.progressions[skLv-1] : null;
+
+      let expanded = '';
+      if (isE) {
+        let tips = '';
+        if (ex.note) tips += `<div class="tip-box note">💡 ${ex.note}</div>`;
+        if (skP?.tip) tips += `<div class="tip-box coach">🎓 ${skP.tip}</div>`;
+
+        let circles = '';
+        for (let i=0; i<ex.sets; i++) {
+          const dn = !!state.done[sKey(state.selDay,si,ei,i)];
+          circles += `<div class="set-circle ${dn?'done':''}" onclick="event.stopPropagation();const k=sKey('${state.selDay}',${si},${ei},${i});const d={...state.done};d[k]=!d[k];setState({done:d})">${i+1}</div>`;
+        }
+
+        let btns = `<button class="btn" onclick="event.stopPropagation();startRestTimer(${ex.rest})">⏱ ${ex.rest}s</button>`;
+        if (sk && skP?.metric === 'hold') {
+          btns += `<button class="btn" onclick="event.stopPropagation();toggleStopwatch('${ex.skill}')">${state.stopwatch ? '⏹ '+fmt(state.swTime)+' speichern' : '⏱ Stoppuhr'}</button>`;
+        }
+        if (sk) {
+          btns += `<button class="btn" onclick="event.stopPropagation();setState({inputTarget:{type:'${skP?.metric}',skill:'${ex.skill}',name:'${ex.name.replace(/'/g,"\\'")}'},inputVal:''})">📝 ${skP?.metric==='hold'?'Hold':'Reps'}</button>`;
+        }
+
+        let inputHtml = '';
+        if (state.inputTarget?.name === ex.name) {
+          inputHtml = `<div style="margin-top:8px;display:flex;gap:6px">
+            <input class="input" type="number" placeholder="${state.inputTarget.type==='hold'?'Sekunden':'Reps'}" value="${state.inputVal}" oninput="state.inputVal=this.value" onclick="event.stopPropagation()">
+            <button class="btn primary" onclick="event.stopPropagation();if(!state.inputVal)return;const logs={...state.${state.inputTarget.type==='hold'?'holdLogs':'repLogs'}};logs['${state.inputTarget.skill}']=[...(logs['${state.inputTarget.skill}']||[]),{val:parseInt(state.inputVal),date:today()}];setState({${state.inputTarget.type==='hold'?'holdLogs':'repLogs'}:logs,inputVal:'',inputTarget:null})">💾</button>
+          </div>`;
+        }
+
+        let logInfo = '';
+        if (ex.skill && state.holdLogs[ex.skill]?.length > 0) {
+          const last = state.holdLogs[ex.skill].slice(-1)[0];
+          logInfo += `<div style="margin-top:8px;font-size:10px;color:var(--a1)">📊 Letzter Hold: ${last.val}s (${last.date})</div>`;
+        }
+        if (ex.skill && state.repLogs[ex.skill]?.length > 0) {
+          const last = state.repLogs[ex.skill].slice(-1)[0];
+          logInfo += `<div style="margin-top:4px;font-size:10px;color:var(--a2)">📊 Letzte Reps: ${last.val} (${last.date})</div>`;
+        }
+
+        expanded = `<div style="margin-top:12px">${tips}
+          <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px">${circles}</div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap">${btns}</div>
+          ${inputHtml}${logInfo}
+        </div>`;
+      }
+
+      exs += `<div class="ex-row ${allD?'done':''}">
+        <div style="display:flex;justify-content:space-between;align-items:center;cursor:pointer" onclick="setState({expandedEx:state.expandedEx==='${exK}'?null:'${exK}'})">
+          <div style="flex:1">
+            <div class="ex-name" style="${allD?'color:var(--ok)':''}">${allD?'✓ ':''}${ex.name}</div>
+            <div class="ex-meta">${ex.sets}×${ex.reps} · ${ex.rest}s Pause</div>
+            ${sk ? `<div class="ex-skill">Stufe ${skLv}: ${skP?.name}</div>` : ''}
+          </div>
+          <div class="chevron ${isE?'open':''}">▾</div>
+        </div>
+        ${expanded}
+      </div>`;
+    });
+
+    sections += `<div class="section-label" style="margin-top:${si===0?'8':'24'}px">${sec.title}</div>${exs}`;
+  });
+
+  let finishBtn = '';
+  if (p === 100) {
+    finishBtn = `<button class="btn primary full" onclick="const mk=today().slice(0,7);const wl={...state.weekLog};const e=wl[mk]||[];if(!e.includes(today())){wl[mk]=[...e,today()];}setState({weekLog:wl,view:'home'})">✅ Training abschließen</button>`;
+  }
+
+  return `<div class="header">
+    <button class="back-btn" onclick="setState({view:'home',expandedEx:null})">← Zurück</button>
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <div style="font-size:18px;font-weight:800">${d.emoji} ${d.name}</div>
+      <div style="font-size:18px;font-weight:800;color:${p===100?'var(--ok)':'var(--a1)'}">${p}%</div>
+    </div>
+    <div style="margin-top:8px;height:4px;background:rgba(255,255,255,0.05);border-radius:2px;overflow:hidden">
+      <div style="height:100%;width:${p}%;background:linear-gradient(90deg,var(--a1),var(--a2));border-radius:2px;transition:width 0.4s"></div>
+    </div>
+  </div>
+  <div class="body-content">${sections}${finishBtn}</div>`;
+}
+
+function renderSkills() {
+  if (state.selSkill) {
+    const sk = SKILLS[state.selSkill]; const lv = state.skillLevels[state.selSkill];
+    let dots = '';
+    sk.progressions.forEach((pr, i) => {
+      const cls = i+1 < lv ? 'done' : i+1 === lv ? 'current' : 'future';
+      dots += `<div class="level-dot ${cls}">${i+1}</div>`;
+      if (i < sk.progressions.length - 1) dots += `<div class="level-line ${i+1<lv?'done':''}"></div>`;
+    });
+
+    let progs = '';
+    sk.progressions.forEach((pr, i) => {
+      const isCur = i+1 === lv; const isD = i+1 < lv;
+      let lvBtn = '';
+      if (isCur) lvBtn = `<button class="btn primary" style="font-size:10px;padding:6px 10px" onclick="const sl={...state.skillLevels};sl['${state.selSkill}']=Math.min(${lv+1},${sk.progressions.length});setState({skillLevels:sl})">Level Up ↑</button>`;
+      let logs = '';
+      if (isCur && (state.holdLogs[state.selSkill]?.length>0 || state.repLogs[state.selSkill]?.length>0)) {
+        let items = '';
+        (state.holdLogs[state.selSkill]||[]).slice(-5).forEach(l => { items += `<div style="font-size:10px;color:var(--a1)">${l.date}: ${l.val}s Hold</div>`; });
+        (state.repLogs[state.selSkill]||[]).slice(-5).forEach(l => { items += `<div style="font-size:10px;color:var(--a2)">${l.date}: ${l.val} Reps</div>`; });
+        logs = `<div style="margin-top:10px;border-top:1px solid var(--brd);padding-top:8px"><div style="font-size:10px;font-weight:700;color:var(--dm);margin-bottom:4px">Letzte Logs:</div>${items}</div>`;
+      }
+      progs += `<div class="ex-row ${isD?'done':''}" style="opacity:${i+1>lv+1?'0.4':'1'}">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start">
+          <div>
+            <div style="font-size:13px;font-weight:700;color:${isD?'var(--ok)':isCur?'var(--a1)':'var(--dm)'}">${isD?'✓ ':isCur?'→ ':''}${pr.name}</div>
+            <div style="font-size:11px;color:var(--dm);margin-top:2px">${pr.desc}</div>
+            <div style="font-size:10px;color:${isCur?'var(--a1)':'var(--dm)'};margin-top:3px">Ziel: ${pr.target}</div>
+            ${pr.tip && isCur ? `<div class="tip-box coach" style="margin-top:4px">🎓 ${pr.tip}</div>` : ''}
+          </div>
+          ${lvBtn}
+        </div>
+        ${logs}
+      </div>`;
+    });
+
+    return `<div class="header">
+      <button class="back-btn" onclick="setState({selSkill:null})">← Alle Skills</button>
+      <div style="font-size:18px;font-weight:800;margin-bottom:6px">${sk.icon} ${sk.name}</div>
+      <div style="display:flex;align-items:center;gap:6px;margin-bottom:20px">${dots}</div>
+    </div>
+    <div class="body-content">${progs}</div>`;
+  }
+
+  let cards = '';
+  Object.entries(SKILLS).forEach(([key, sk]) => {
+    const lv = state.skillLevels[key]; const mx = sk.progressions.length; const pr = sk.progressions[lv-1];
+    cards += `<div class="card fade-up" onclick="setState({selSkill:'${key}'})">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div>
+          <div style="font-size:14px;font-weight:700">${sk.icon} ${sk.name}</div>
+          <div style="font-size:11px;color:var(--a1);margin-top:2px">Stufe ${lv}: ${pr?.name}</div>
+          <div style="font-size:10px;color:var(--dm);margin-top:2px">Ziel: ${pr?.target}</div>
+        </div>
+        <div style="font-size:18px;font-weight:800;color:var(--a1)">${lv}<span style="font-size:11px;color:var(--dm)">/${mx}</span></div>
+      </div>
+      <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:${(lv/mx)*100}%"></div></div>
+    </div>`;
+  });
+
+  return `<div class="header">
+    <div class="logo">Skill-Baum</div>
+    <div style="font-size:12px;color:var(--dm);margin-top:5px">Deine Progressionen</div>
+  </div>
+  <div class="body-content">${cards}</div>`;
+}
+
+function renderStats() {
+  // BW chart
+  let bwChart = '<div style="font-size:11px;color:var(--dm);text-align:center;padding:16px">Noch keine Einträge</div>';
+  if (state.bodyWeight.length > 0) {
+    const slice = state.bodyWeight.slice(-14);
+    const vals = slice.map(x => x.value);
+    const mn = Math.min(...vals) - 2, mx = Math.max(...vals) + 2;
+    let bars = '';
+    slice.forEach(w => {
+      const pct = mx===mn ? 50 : ((w.value-mn)/(mx-mn))*100;
+      bars += `<div class="bw-bar"><div class="bw-bar-val">${w.value}</div><div class="bw-bar-fill" style="height:${Math.max(pct,8)}%"></div></div>`;
+    });
+    bwChart = `<div style="display:flex;align-items:flex-end;gap:3px;height:70px">${bars}</div>`;
+  }
+
+  let bwInput = '';
+  if (state.showBwInput) {
+    bwInput = `<div style="display:flex;gap:6px;margin-bottom:12px">
+      <input class="input" type="number" placeholder="kg" value="${state.bwInput}" oninput="state.bwInput=this.value">
+      <button class="btn primary" onclick="if(!state.bwInput)return;setState({bodyWeight:[...state.bodyWeight,{value:parseFloat(state.bwInput),date:today()}],bwInput:'',showBwInput:false})">💾</button>
+    </div>`;
+  }
+
+  // Hold PRs
+  let holds = '<div style="font-size:11px;color:var(--dm);text-align:center;padding:16px">Noch keine Holds</div>';
+  if (Object.keys(state.holdLogs).length > 0) {
+    holds = '';
+    Object.entries(state.holdLogs).forEach(([key,logs]) => {
+      const best = Math.max(...logs.map(l=>l.val)); const sk = SKILLS[key];
+      holds += `<div class="stat-row"><div style="font-size:12px;font-weight:600">${sk?.icon} ${sk?.name}</div><div style="font-size:11px;color:var(--a1);margin-top:2px">Best: ${best}s · ${logs.length} Logs</div></div>`;
+    });
+  }
+
+  // Rep PRs
+  let reps = '<div style="font-size:11px;color:var(--dm);text-align:center;padding:16px">Noch keine Reps</div>';
+  if (Object.keys(state.repLogs).length > 0) {
+    reps = '';
+    Object.entries(state.repLogs).forEach(([key,logs]) => {
+      const best = Math.max(...logs.map(l=>l.val)); const sk = SKILLS[key];
+      reps += `<div class="stat-row"><div style="font-size:12px;font-weight:600">${sk?.icon} ${sk?.name}</div><div style="font-size:11px;color:var(--a2);margin-top:2px">Best: ${best} Reps · ${logs.length} Logs</div></div>`;
+    });
+  }
+
+  // Frequency
+  let freq = '<div style="font-size:11px;color:var(--dm);text-align:center;padding:16px">Noch keine Logs</div>';
+  const wkEntries = Object.entries(state.weekLog).sort().reverse().slice(0,4);
+  if (wkEntries.length > 0) {
+    freq = '';
+    wkEntries.forEach(([m,days]) => {
+      freq += `<div class="stat-row"><div style="font-size:12px;font-weight:600">${m}</div><div style="font-size:11px;color:var(--a1);margin-top:2px">${days.length} Trainingstage</div></div>`;
+    });
+  }
+
+  return `<div class="header">
+    <div class="logo">Statistiken</div>
+    <div style="font-size:12px;color:var(--dm);margin-top:5px">Fortschritt & Tracking</div>
+  </div>
+  <div class="body-content">
+    <div class="stat-card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+        <div style="font-size:13px;font-weight:700">📊 Körpergewicht</div>
+        <button class="btn" onclick="setState({showBwInput:!state.showBwInput})">+ Eintrag</button>
+      </div>
+      ${bwInput}${bwChart}
+    </div>
+    <div class="stat-card"><div style="font-size:13px;font-weight:700;margin-bottom:12px">⏱ Beste Haltezeiten</div>${holds}</div>
+    <div class="stat-card"><div style="font-size:13px;font-weight:700;margin-bottom:12px">💪 Beste Reps</div>${reps}</div>
+    <div class="stat-card"><div style="font-size:13px;font-weight:700;margin-bottom:12px">📅 Trainingsfrequenz</div>${freq}</div>
+    <button class="btn danger full" onclick="if(confirm('Alle Daten wirklich löschen?')){setState({done:{},skillLevels:Object.fromEntries(Object.entries(SKILLS).map(([k,v])=>[k,v.current])),holdLogs:{},repLogs:{},weekLog:{},bodyWeight:[]})}">🗑 Alle Daten zurücksetzen</button>
+  </div>`;
+}
+
+function renderProfile() {
+  const p = state.profileData;
+  const editable = [
+    ['height','Größe'], ['weight','Gewicht'], ['age','Alter'], ['goal','Ziel'], ['level','Level'],
+    ['frequency','Frequenz'], ['duration','Dauer'], ['focus','Fokus'], ['equipment','Equipment'],
+    ['nutrition','Ernährungs-Tracking'], ['injuries','Verletzungen'], ['split','Split-Typ']
+  ];
+
+  let rows = '';
+  if (state.profileEdit) {
+    editable.forEach(([k,label]) => {
+      rows += `<div style="margin-bottom:12px">
+        <div style="font-size:11px;color:var(--dm);margin-bottom:4px">${label}</div>
+        <input class="input" value="${p[k]}" oninput="state.profileData={...state.profileData,${k}:this.value}">
+      </div>`;
+    });
+    rows += `<button class="btn primary" style="width:100%;padding:12px" onclick="save('g-profile',state.profileData);setState({profileEdit:false})">💾 Speichern</button>`;
+  } else {
+    editable.forEach(([k,label]) => {
+      rows += `<div class="profile-row"><span class="profile-label">${label}</span><span class="profile-value">${p[k]}</span></div>`;
+    });
+  }
+
+  // BMI
+  let bmiSection = '';
+  const heightMatch = p.height.match(/(\d+)/);
+  const weightMatch = p.weight.match(/(\d+)/);
+  if (heightMatch && weightMatch) {
+    const hCm = parseInt(heightMatch[1]) + 2.5; // midpoint
+    const wKg = parseInt(weightMatch[1]) + 2.5;
+    const bmi = (wKg / ((hCm/100)**2)).toFixed(1);
+    let bmiColor = 'var(--a1)';
+    let bmiLabel = 'Normalgewicht';
+    if (bmi < 18.5) { bmiColor = 'var(--w)'; bmiLabel = 'Untergewicht'; }
+    else if (bmi >= 25) { bmiColor = 'var(--w)'; bmiLabel = 'Übergewicht'; }
+    bmiSection = `<div class="stat-card">
+      <div style="font-size:13px;font-weight:700;margin-bottom:8px">📐 BMI (geschätzt)</div>
+      <div style="font-size:28px;font-weight:800;color:${bmiColor}">${bmi}</div>
+      <div style="font-size:11px;color:var(--dm);margin-top:2px">${bmiLabel} · Hinweis: BMI ignoriert Muskelmasse</div>
+    </div>`;
+  }
+
+  // Calorie estimate
+  let calSection = '';
+  if (heightMatch && weightMatch) {
+    const wKg = parseInt(weightMatch[1]) + 2.5;
+    const ageVal = parseInt(p.age.match(/(\d+)/)?.[1] || 30);
+    const hCm = parseInt(heightMatch[1]) + 2.5;
+    const bmr = Math.round(10 * wKg + 6.25 * hCm - 5 * ageVal + 5); // Mifflin-St Jeor (male)
+    const tdee = Math.round(bmr * 1.725); // very active
+    const surplus = Math.round(tdee + 300);
+    calSection = `<div class="stat-card">
+      <div style="font-size:13px;font-weight:700;margin-bottom:8px">🔥 Kalorien-Schätzung</div>
+      <div class="profile-row"><span class="profile-label">Grundumsatz (BMR)</span><span class="profile-value">${bmr} kcal</span></div>
+      <div class="profile-row"><span class="profile-label">TDEE (sehr aktiv)</span><span class="profile-value">${tdee} kcal</span></div>
+      <div class="profile-row"><span class="profile-label">Aufbau (+300)</span><span class="profile-value" style="color:var(--a1)">${surplus} kcal</span></div>
+      <div style="font-size:10px;color:var(--dm);margin-top:8px">Schätzung nach Mifflin-St Jeor. Für genaue Werte Ernährungsberater konsultieren.</div>
+    </div>`;
+  }
+
+  return `<div class="header">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <div class="logo">Profil</div>
+      <button class="btn" onclick="setState({profileEdit:!state.profileEdit})">${state.profileEdit ? '✕ Abbrechen' : '✏️ Bearbeiten'}</button>
+    </div>
+    <div style="font-size:12px;color:var(--dm);margin-top:5px">Deine persönlichen Daten</div>
+  </div>
+  <div class="body-content">
+    <div class="stat-card">
+      <div style="font-size:14px;font-weight:700;margin-bottom:16px">👤 Trainingsinfo</div>
+      ${rows}
+    </div>
+    ${bmiSection}
+    ${calSection}
+    <div class="stat-card">
+      <div style="font-size:14px;font-weight:700;margin-bottom:12px">🔥 Schwerpunkt-Strategie</div>
+      <div style="font-size:12px;color:var(--dm);line-height:1.6">
+        Dein Plan hat <span style="color:var(--a1);font-weight:700">4 Skill-Tage</span> mit Fokus auf Rücken & Schultern. Die Skill-Arbeit steht immer am Anfang, wenn du noch frisch bist. Gym-Maschinen ergänzen das Volumen gezielt. Parallettes, Bänder und Gewichtsweste sind in den Plan integriert.
+      </div>
+    </div>
+  </div>`;
+}
+
+// Init
+render();
+</script>
+</body>
+</html>
